@@ -352,14 +352,10 @@ pub const Object = struct {
             const codeCount = try reader.readInt(usize, .Big);
 
             const codeBytes = try vm.allocator.alloc(u8, codeCount);
-            defer vm.allocator.free(codeBytes);
-
             const readBytes = try reader.read(codeBytes);
             std.debug.assert(readBytes == codeBytes.len);
 
-            var code = try std.ArrayList(u8).initCapacity(vm.allocator, codeCount);
-            try code.appendSlice(codeBytes);
-
+            var code = std.ArrayList(u8).fromOwnedSlice(vm.allocator, codeBytes);
             std.debug.assert(code.items.len == codeCount);
 
             const object = try Self.allocate(vm, Function, .Function);
